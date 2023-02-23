@@ -1,9 +1,8 @@
-// This is just a mock data file to build the component standalone without the integration with the XOBuyernodeserv
-// Needs to be removed later
+/* eslint-disable eslint-comments/disable-enable-pair */
+/* eslint-disable flowtype/no-weak-types */
 
-
-
-export const googlePayConfig = () => {
+/* @flow */
+export  function googlePayConfig(): any {
     return (
         {
             data : {
@@ -30,7 +29,6 @@ export const googlePayConfig = () => {
                 },
               ],
               merchantInfo: {
-                merchantName: "Example Merchant",
                 merchantId: "01234567890123456789",
                 merchantOrigin: "sub-merchant.com",
                 authJwt: "aaaaa.bbbbb.ccccc"
@@ -39,8 +37,3 @@ export const googlePayConfig = () => {
         }
     );
 }
-
-
-// export const approveGooglePayPayment = () => {
-//     return();
-// }

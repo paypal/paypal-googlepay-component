@@ -1,3 +1,4 @@
+/* @flow */
 export class PayPalGooglePayError extends Error {
     paypalDebugId: null | string;
     errorName: string;
