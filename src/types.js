@@ -1,6 +1,10 @@
 /* @flow */
 
-
+export type PayPalGooglePayErrorType = {|
+    name: string,
+    message: string,
+    paypalDebugId: null | string,
+  |};
 
 export type ConfigResponse = {|
       allowedPaymentMethods: $ReadOnlyArray<{|
@@ -24,3 +28,8 @@ export type ConfigResponse = {|
         merchantOrigin: string
       |}
     |}
+
+export type GooglePayType = {|
+    config: () => Promise<ConfigResponse | PayPalGooglePayErrorType>,
+    confirmOrder: () => Promise<string>
+  |}

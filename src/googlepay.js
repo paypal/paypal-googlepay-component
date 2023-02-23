@@ -16,9 +16,9 @@ import {
     DEFAULT_GQL_HEADERS,
   } from "./constants";
   import  { logGooglePayEvent } from "./logging";
-  import type { ConfigResponse} from './types' 
+  import type { ConfigResponse, PayPalGooglePayErrorType } from "./types"; 
  
-export function googlePayConfig(): Promise<ConfigResponse> | PayPalGooglePayError {
+export function googlePayConfig(): Promise<ConfigResponse | PayPalGooglePayErrorType> {
     logGooglePayEvent("GetApplepayConfig")
     return fetch(`${getPayPalDomain()}/graphql?GetApplepayConfig`, {
         method: "POST",

@@ -17,11 +17,7 @@ export const DEFAULT_API_HEADERS = {
     "x-app-name": "sdk-googlepay",
     "Content-Type": "application/json",
     Accept: "application/json",
-  
-    origin:
-      process.env.NODE_ENV === "test"
-        ? "https://www.mypaypal.com"
-        : window.location,
+    origin: window.location,
     prefer: "return=representation",
   };
   

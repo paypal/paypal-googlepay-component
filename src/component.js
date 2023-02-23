@@ -1,17 +1,18 @@
 /* @flow */
 
-import { getClientID } from "@paypal/sdk-client/src";
 
 import { googlePayConfig } from './mock'
+import type { ConfigResponse, PayPalGooglePayErrorType, GooglePayType } from "./types"; 
 
-async function config(){
+function config():Promise<ConfigResponse | PayPalGooglePayErrorType>{
   return googlePayConfig();
 }
 
-async function confirmOrder(){
-  
+function confirmOrder(): Promise<string>{
+  return Promise.resolve("Some response")
 }
-export const GooglePay = () => {
+
+export function GooglePay(): GooglePayType {
     return {
         config,
         confirmOrder
