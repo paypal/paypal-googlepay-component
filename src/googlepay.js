@@ -20,7 +20,7 @@ import {
  
 export function googlePayConfig(): Promise<ConfigResponse | PayPalGooglePayErrorType> {
     logGooglePayEvent("GetApplepayConfig")
-    return fetch(`${getPayPalDomain()}/graphql?GetApplepayConfig`, {
+    return fetch(`https://www.te-googlepay-sdk.qa.paypal.com/graphql?GetGooglePayConfig`, {
         method: "POST",
         headers: {
           ...DEFAULT_GQL_HEADERS,
@@ -87,7 +87,7 @@ export function googlePayConfig(): Promise<ConfigResponse | PayPalGooglePayError
             );
           }
     
-          return (data.googlepayConfig);
+          return (data.googlePayConfig);
         })
         .catch((err) => {
           getLogger()

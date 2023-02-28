@@ -1,7 +1,7 @@
 /* @flow */
 
 
-import { googlePayConfig } from './mock'
+import { googlePayConfig } from './googlepay'
 import type { ConfigResponse, PayPalGooglePayErrorType, GooglePayType } from "./types"; 
 
 function config():Promise<ConfigResponse | PayPalGooglePayErrorType>{
