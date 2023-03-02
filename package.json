@@ -68,7 +68,7 @@
     "type": "git",
     "url": "git+https://github.com/paypal/paypal-googlepay-component.git"
   },
-  "author": "dbrain",
+  "author": "RatnadeepSimhadri",
   "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/paypal/paypal-googlepay-component/issues"
