@@ -2,9 +2,10 @@
 
 
 import {
-    getLogger,
-    getPayPalDomain,
-  } from "@paypal/sdk-client/src";
+  getClientID,
+  getLogger,
+
+} from "@paypal/sdk-client/src";
   import { FPTI_KEY } from "@paypal/sdk-constants/src";
   
   import {
@@ -16,7 +17,7 @@ import {
     DEFAULT_GQL_HEADERS,
   } from "./constants";
   import  { logGooglePayEvent } from "./logging";
-  import type { ConfigResponse, PayPalGooglePayErrorType } from "./types"; 
+  import type { ConfigResponse, PayPalGooglePayErrorType, ConfirmOrderParams, ApprovePaymentResponse } from "./types"; 
  
 export function googlePayConfig(): Promise<ConfigResponse | PayPalGooglePayErrorType> {
     logGooglePayEvent("GetApplepayConfig")
@@ -100,4 +101,89 @@ export function googlePayConfig(): Promise<ConfigResponse | PayPalGooglePayError
     
           throw err;
         });
+}
+
+export function confirmOrder({
+  orderId,
+  paymentMethodData,
+  shippingAddress
+}: ConfirmOrderParams): Promise<ApprovePaymentResponse | PayPalGooglePayErrorType> {
+
+  logGooglePayEvent("paymentauthorized");
+
+  const billingContact = paymentMethodData?.info?.billingAddress;
+  return fetch(`https://www.te-googlepay-sdk.qa.paypal.com/graphql?ApproveGooglePayPayment`, {
+    method: "POST",
+    headers: {
+      ...DEFAULT_GQL_HEADERS
+    },
+    body: JSON.stringify({
+      query: `
+                    mutation ApproveGooglePayPayment(
+                      $paymentMethodData: GooglePayPaymentMethodData!
+                      $orderID: String!
+                      $clientID : String!
+                      $billingContact: GooglePayPaymentContact!
+                    ) {
+                      approveGooglePayPayment(
+                        paymentMethodData: $paymentMethodData
+                        orderID: $orderID
+                        clientID: $clientID
+                        billingContact: $billingContact
+                        shippingContact: $shippingContact
+                      )
+                    }`,
+      variables: {
+        paymentMethodData,
+        clientID: getClientID(),
+        orderID: orderId,
+        billingContact,
+        shippingContact: shippingAddress
+      },
+    }),
+  })
+    .then((res) => {
+      if (!res.ok) {
+        const { headers } = res;
+        const error = {
+          name: "INTERNAL_SERVER_ERROR",
+          fullDescription: "An internal server error has occurred",
+          paypalDebugId: headers.get("Paypal-Debug-Id"),
+        };
+
+        throw new PayPalGooglePayError(
+          error.name,
+          error.fullDescription,
+          error.paypalDebugId
+        );
+      }
+      return res.json();
+    })
+    .then(({ data, errors, extensions }) => {
+      if (Array.isArray(errors) && errors.length) {
+        const error = {
+          name: errors[0]?.name || "GOOGLEPAY_PAYMENT_ERROR",
+          fullDescription: errors[0]?.message ?? JSON.stringify(errors[0]),
+          paypalDebugId: extensions?.correlationId,
+        };
+
+        throw new PayPalGooglePayError(
+          error.name,
+          error.fullDescription,
+          error.paypalDebugId
+        );
+      }
+      return (data.approveGooglePayPayment);
+    })
+    .catch((err) => {
+      getLogger()
+        .error(FPTI_TRANSITION.GOOGLEPAY_PAYMENT_ERROR)
+        .track({
+          [FPTI_KEY.TRANSITION]: FPTI_TRANSITION.GOOGLEPAY_PAYMENT_ERROR,
+          [FPTI_CUSTOM_KEY.ERR_DESC]: `Error: ${err.message}) }`,
+        })
+        .flush();
+
+      throw err;
+    });
 }

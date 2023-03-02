@@ -1,20 +1,12 @@
 /* @flow */
 
-
-import { googlePayConfig } from './googlepay'
-import type { ConfigResponse, PayPalGooglePayErrorType, GooglePayType } from "./types"; 
-
-function config():Promise<ConfigResponse | PayPalGooglePayErrorType>{
-  return googlePayConfig();
-}
-
-function confirmOrder(): Promise<string>{
-  return Promise.resolve("Some response")
-}
+import { googlePayConfig } from './mock'
+import { confirmOrder } from './googlepay'
+import type {  GooglePayType } from "./types"; 
 
 export function GooglePay(): GooglePayType {
     return {
-        config,
+        config: googlePayConfig,
         confirmOrder
     }
 }

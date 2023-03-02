@@ -5,7 +5,6 @@
 export  function googlePayConfig(): any {
     return (
         {
-            data : {
             allowedPaymentMethods: [
                 {
                   type: "CARD",
@@ -29,11 +28,11 @@ export  function googlePayConfig(): any {
                 },
               ],
               merchantInfo: {
-                merchantId: "01234567890123456789",
-                merchantOrigin: "sub-merchant.com",
-                authJwt: "aaaaa.bbbbb.ccccc"
+                // merchantId: "12345678901234567890",
+                merchantId: "6JTQHLV4QH9TJ",
+                merchantOrigin: "stage-googlepay-paypal-js-sdk.herokuapp.com",
+                merchantName: "Test Merchant"
               }
-            }
         }
     );
 }
