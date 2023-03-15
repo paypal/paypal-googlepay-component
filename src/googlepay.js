@@ -4,7 +4,7 @@
 import {
   getClientID,
   getLogger,
-
+  getPayPalAPIDomain,
 } from "@paypal/sdk-client/src";
   import { FPTI_KEY } from "@paypal/sdk-constants/src";
   
@@ -15,13 +15,67 @@ import {
     FPTI_TRANSITION,
     FPTI_CUSTOM_KEY,
     DEFAULT_GQL_HEADERS,
+    DEFAULT_API_HEADERS
   } from "./constants";
   import  { logGooglePayEvent } from "./logging";
-  import type { ConfigResponse, PayPalGooglePayErrorType, ConfirmOrderParams, ApprovePaymentResponse } from "./types"; 
+  import type { ConfigResponse, PayPalGooglePayErrorType, ConfirmOrderParams, ApprovePaymentResponse, OrderPayload, CreateOrderResponse } from "./types"; 
+
+
+  export async function createOrder(
+    payload: OrderPayload
+  ): Promise<CreateOrderResponse> {
+    const basicAuth = btoa(`${getClientID()}`);
+  
+    try {
+      const accessToken = await fetch(`https://api.te-gpay-api-e2e.qa.paypal.com/v1/oauth2/token`, {
+        method: "POST",
+        headers: {
+          Authorization: `Basic ${basicAuth}`,
+
+        },
+        body: "grant_type=client_credentials",
+      })
+        .then((res) => {
+          return res.json();
+        })
+        .then(({ access_token }) => {
+          return access_token;
+        });
+  
+      const res = await fetch(`https://api.te-gpay-api-e2e.qa.paypal.com/v2/checkout/orders`, {
+        method: "POST",
+        headers: {
+          ...DEFAULT_API_HEADERS,
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify(payload),
+      }).catch((err) => {
+        throw err;
+      });
+  
+      const { id, status } = await res.json();
+  
+      return {
+        id,
+        status,
+      };
+    } catch (error) {
+      getLogger()
+        .error(FPTI_TRANSITION.GOOGLEPAY_CREATE_ORDER_ERROR)
+        .track({
+          [FPTI_KEY.TRANSITION]: FPTI_TRANSITION.GOOGLEPAY_CREATE_ORDER_ERROR,
+          [FPTI_CUSTOM_KEY.ERR_DESC]: `Error: ${error.message}) }`,
+        })
+        .flush();
+      throw error;
+    }
+  }
  
 export function googlePayConfig(): Promise<ConfigResponse | PayPalGooglePayErrorType> {
     logGooglePayEvent("GetApplepayConfig")
-    return fetch(`https://www.te-googlepay-sdk.qa.paypal.com/graphql?GetGooglePayConfig`, {
+    const host = "https://www.te-gpay-api-e2e.qa.paypal.com"
+    const localHost = "https://localhost.paypal.com:9000"
+    return fetch(`${localHost}/graphql?GetGooglePayConfig`, {
         method: "POST",
         headers: {
           ...DEFAULT_GQL_HEADERS,
@@ -30,12 +84,10 @@ export function googlePayConfig(): Promise<ConfigResponse | PayPalGooglePayError
           query: `
                     query getGooglePayConfig(
                         $clientId: String!
-                        $merchantId: [String]!
                         $merchantOrigin: String!
                     ) {
                         googlePayConfig(
                         clientId: $clientId
-                        merchantId:$merchantId
                         merchantOrigin:$merchantOrigin
                         ){
                         allowedPaymentMethods{
@@ -43,6 +95,11 @@ export function googlePayConfig(): Promise<ConfigResponse | PayPalGooglePayError
                             parameters{
                             allowedAuthMethods
                             allowedCardNetworks
+                            billingAddressRequired
+                            assuranceDetailsRequired
+                            billingAddressParameters {
+                              format
+                            }
                             }
                             tokenizationSpecification{
                             type
@@ -53,17 +110,14 @@ export function googlePayConfig(): Promise<ConfigResponse | PayPalGooglePayError
                             }
                         }
                         merchantInfo {
-                            merchantName
                             merchantOrigin
                             merchantId
-                            authJwt
                         }
                         }
                     }`,
           variables: {
             clientId: 'B_AMvrD5p50dtQXhxF2gaQYxM3zxsQP6RVTLfx1JN5aGgPSDy1zR-EonK0ED3DZlxfyi28odj2IR1pnJBk',
-            merchantOrigin: "www.checkout.com",
-            merchantId: ["6JTQHLV4QH9TJ"],
+            merchantOrigin: "https://stage-googlepay-paypal-js-sdk.herokuapp.com"
           },
         }),
       })
@@ -106,13 +160,14 @@ export function googlePayConfig(): Promise<ConfigResponse | PayPalGooglePayError
 export function confirmOrder({
   orderId,
   paymentMethodData,
-  shippingAddress
+  shippingAddress,
+  email
 }: ConfirmOrderParams): Promise<ApprovePaymentResponse | PayPalGooglePayErrorType> {
 
   logGooglePayEvent("paymentauthorized");
-
-  const billingContact = paymentMethodData?.info?.billingAddress;
-  return fetch(`https://www.te-googlepay-sdk.qa.paypal.com/graphql?ApproveGooglePayPayment`, {
+  const host = "https://www.te-gpay-api-e2e.qa.paypal.com"
+  const localHost = "https://localhost.paypal.com:9000"
+  return fetch(`${localHost}/graphql?ApproveGooglePayPayment`, {
     method: "POST",
     headers: {
       ...DEFAULT_GQL_HEADERS
@@ -123,22 +178,23 @@ export function confirmOrder({
                       $paymentMethodData: GooglePayPaymentMethodData!
                       $orderID: String!
                       $clientID : String!
-                      $billingContact: GooglePayPaymentContact!
+                      $shippingAddress: GooglePayPaymentContact
+                      $email: String
                     ) {
                       approveGooglePayPayment(
                         paymentMethodData: $paymentMethodData
                         orderID: $orderID
                         clientID: $clientID
-                        billingContact: $billingContact
-                        shippingContact: $shippingContact
+                        shippingAddress: $shippingAddress
+                        email: $email
                       )
                     }`,
       variables: {
         paymentMethodData,
         clientID: getClientID(),
         orderID: orderId,
-        billingContact,
-        shippingContact: shippingAddress
+        shippingAddress,
+        email
       },
     }),
   })

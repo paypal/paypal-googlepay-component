@@ -1,5 +1,13 @@
 /* @flow */
 
+export type OrderPayload = {|
+  intent: string,
+  purchase_units: $ReadOnlyArray<{|
+    amount: {| currency_code: string, value: string |},
+    payee: {| merchant_id: string |},
+  |}>,
+|};
+
 export type PayPalGooglePayErrorType = {|
     name: string,
     message: string,
@@ -94,10 +102,18 @@ export type GooglePayPaymentMethodData = {|
 export type ConfirmOrderParams = {|
   paymentMethodData: GooglePayPaymentMethodData,
   orderId: string,
-  shippingAddress?: GooglePayPaymentContanct
+  shippingAddress?: GooglePayPaymentContanct,
+  email: string,
 |}
 
+
+export type CreateOrderResponse = {|
+  id: string,
+  status: string,
+|};
+
  export type GooglePayType = {|
+  createOrder(OrderPayload): Promise<CreateOrderResponse>,
   config: () => Promise<ConfigResponse | PayPalGooglePayErrorType>,
   confirmOrder: (ConfirmOrderParams) => Promise<ApprovePaymentResponse | PayPalGooglePayErrorType>
 |}

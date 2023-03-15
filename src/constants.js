@@ -24,6 +24,8 @@ export const DEFAULT_API_HEADERS = {
   export const FPTI_TRANSITION = {
     GOOGLEPAY_EVENT: ("googlepay_event": "googlepay_event"),
     GOOGLEPAY_FLOW_ERROR: ("googlepay_flow_error": "googlepay_flow_error"),
+    GOOGLEPAY_CREATE_ORDER_ERROR:
+    ("googlepay_create_order_error": "googlepay_create_order_error"),
     GOOGLEPAY_ON_CLICK_INVALID:
       ("googlepay_onclick_invalid": "googlepay_onclick_invalid"),
     GOOGLEPAY_PAYMENT_ERROR: ("googlepay_payment_error": "googlepay_payment_error"),
