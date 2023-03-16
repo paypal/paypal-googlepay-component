@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Test</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+  </head>
+  <script src="https://localhost.paypal.com:8443/sdk/js?client-id=B_AMvrD5p50dtQXhxF2gaQYxM3zxsQP6RVTLfx1JN5aGgPSDy1zR-EonK0ED3DZlxfyi28odj2IR1pnJBk&merchant-id=6JTQHLV4QH9TJ&components=buttons,googlepay"></script>
+
+  <!-- <script src="https://www.te-alm-23316952001471623082593.qa.paypal.com/sdk/js?client-id=AVVSS5kWC3KEdory_C7uev8yYIZyemM4BQC9tt-koQDL5iRgjTAkpypPaE29mEGy1eRFCAEOjGYWN1TC&components=buttons,fields,marks&buyer-country=BE&currency=EUR"></script> -->
+  <!--
+  <script src="https://www.msmaster.qa.paypal.com/sdk/js?client-id=AVVSS5kWC3KEdory_C7uev8yYIZyemM4BQC9tt-koQDL5iRgjTAkpypPaE29mEGy1eRFCAEOjGYWN1TC&debug=true&components=buttons,fields,marks&buyer-country=BE"></script>
+-->
+  <script>
+    console.log("PayPal SDK version:", paypal.version);
+
+    function parseQuery(queryString) {
+      var query = {};
+      var pairs = (
+        queryString[0] === "?" ? queryString.substr(1) : queryString
+      ).split("&");
+      for (var i = 0; i < pairs.length; i++) {
+        var pair = pairs[i].split("=");
+        query[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1] || "");
+      }
+      return query;
+    }
+
+    function authorizeOrder(orderId, accessToken) {
+      console.log("authorize order");
+      createPreElement("Authorize Order Call");
+      return fetch(
+        `https://api.sandbox.paypal.com/v2/checkout/orders/${orderId}/authorize`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+            // 'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: JSON.stringify({
+            payment_source: {
+              card: {
+                number: "4020020177388978",
+                expiry: "2025-01",
+                attributes: {
+                  verification: {
+                    method: "SCA_ALWAYS",
+                  },
+                },
+              },
+            },
+          }),
+        }
+      );
+    }
+
+    function createOrder(accessToken) {
+      console.log("create order");
+      createPreElement("Create Order call");
+      return fetch("https://api.sandbox.paypal.com/v2/checkout/orders", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+          // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: JSON.stringify({
+          intent: "AUTHORIZE",
+          payer: {
+            address: {
+              address_line_1: "123 Townsend St",
+              address_line_2: "Floor 6",
+              admin_area_2: "Ginza",
+              admin_area_1: "Tokya",
+              postal_code: "170-3293",
+              country_code: "FR",
+            },
+          },
+          purchase_units: [
+            {
+              reference_id: "#0000",
+              description: "Item bought in SANDBOX at Hemm Store",
+              custom_id: "#1111",
+              amount: {
+                currency_code: "EUR",
+                value: "100",
+                breakdown: {
+                  item_total: {
+                    currency_code: "EUR",
+                    value: "100",
+                  },
+                  tax_total: {
+                    currency_code: "EUR",
+                    value: "0",
+                  },
+                },
+              },
+              payee: {
+                email_address:
+                  "p4pmp_5abae232-5b37-4685-846f-f0fbb76bf5d8@shopify.com",
+              },
+              shipping: {
+                address: {
+                  address_line_1: "2211 N First Street",
+                  address_line_2: "Building 17",
+                  admin_area_2: "Ginza",
+                  admin_area_1: "Tokyo",
+                  postal_code: "170-3293",
+                  country_code: "FR",
+                },
+              },
+            },
+          ],
+        }),
+      });
+    }
+
+    function captureOrderStage(orderId, accessToken, status) {
+      console.log("capture order");
+      createPreElement("capture Order Call");
+      return fetch(
+        `https://msmaster.qa.paypal.com:12326/v2/checkout/orders/${orderId}/capture`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+            // 'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: JSON.stringify({
+            payment_source: {
+              card: {
+                ...(status === "fail"
+                  ? { number: "4000000000001125" }
+                  : { number: "4000000000001091" }),
+                expiry: "2026-01",
+
+                name: "John Doe",
+                attributes: {
+                  verification: {
+                    method: "SCA_ALWAYS",
+                  },
+                },
+              },
+            },
+            application_context: {
+              stored_payment_source: {
+                payment_initiator: "CUSTOMER",
+                payment_type: "UNSCHEDULED",
+                usage: "SUBSEQUENT",
+              },
+            },
+          }),
+        }
+      );
+    }
+
+    function captureOrder(orderId, accessToken) {
+      console.log("capture order");
+      createPreElement("capture Order Call");
+      return fetch(
+        `https://api.sandbox.paypal.com:12326/v2/checkout/orders/${orderId}/capture`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+            // 'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: JSON.stringify({
+            payment_source: {
+              card: {
+                number: " 4868719796782421",
+                expiry: "2025-01",
+                name: "John Doe",
+                attributes: {
+                  verification: {
+                    method: "SCA_ALWAYS",
+                  },
+                },
+              },
+            },
+            application_context: {
+              stored_payment_source: {
+                payment_initiator: "CUSTOMER",
+                payment_type: "UNSCHEDULED",
+                usage: "SUBSEQUENT",
+              },
+            },
+          }),
+        }
+      );
+    }
+
+    function createOrderStage(accessToken) {
+      console.log("create order");
+      createPreElement("Create Order call");
+      return fetch("https://msmaster.qa.paypal.com:12326/v2/checkout/orders", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+          // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: JSON.stringify({
+          intent: "CAPTURE",
+          payer: {
+            name: {
+              given_name: "Mr Bean",
+              surname: "user",
+            },
+            address: {
+              address_line_1: "123 Townsend St",
+              address_line_2: "Floor 6",
+              admin_area_2: "San Francisco",
+              admin_area_1: "CA",
+              postal_code: "94107",
+              country_code: "US",
+            },
+          },
+          purchase_units: [
+            {
+              description: "Item bought at Hemm Store",
+              custom_id: "1111",
+              soft_descriptor: "",
+              amount: {
+                currency_code: "USD",
+                value: "83.00",
+              },
+              shipping: {
+                address: {
+                  address_line_1: "2211 N First Street",
+                  address_line_2: "Building 17",
+                  admin_area_2: "San Jose",
+                  admin_area_1: "",
+                  postal_code: "95131",
+                  country_code: "US",
+                },
+              },
+            },
+          ],
+        }),
+      });
+    }
+
+    function generateAccessToken() {
+      createPreElement("Generate Access Token call");
+      console.log("Generate Access Token");
+      return fetch("https://api.sandbox.paypal.com/v1/oauth2/token", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization:
+            "Basic QVpPVkstYUpoMTFoSk9mWUVGRzNLLU5adGcyMUVLYXZKUDY0R05pbnplLXZMYmVoMnRLRXd0OEhqUXBKR1F1NF83SUc5ZkMxLTNrbkJrcy06RUc2cDhXb3FiUEhOWlhpaGtyd3FwQXkxSnkxdkdoSTFhelQwR2xLN2JiWk1PeFBWV0hfYWZyZG1SM2xXd3JIaDZKcWkzNXdST25ZdHpoR2w=",
+          // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: "grant_type=client_credentials&response_type=token&ignoreCache=true",
+      });
+    }
+
+    function generateAccessTokenStage() {
+      createPreElement("Generate Access Token call");
+      console.log("Generate Access Token");
+      return fetch("https://msmaster.qa.paypal.com:12326/v1/oauth2/token", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization:
+            "Basic Ql9BUzRRMFl4NXJ6UUtJaDQwVUVOQlZWLWdLX1lWN3hXZndRMDlWNDdPZTctdnc2bG9IUzVWblM0djQ3UzRnMEFTcWdjOURVVkRjMklJMUIxRTpFQU94eGdHN09NREZqZlVqQTQ0UVZrQlhZUUlaU240TC1IMHRuMGFfV2hheEt6ZWlNaUs3WDd6cHhKUllqNnhUSjdYeG9MRGwza2k1ZmNxbg==",
+          // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: "grant_type=client_credentials&response_type=token&ignoreCache=true",
+      });
+    }
+
+    function createPreElement(content) {
+      const preEle = document.createElement("p");
+      preEle.textContent = "\n" + content;
+      document.getElementById("content").appendChild(preEle);
+    }
+  </script>
+  <script>
+    async function onLaunch(status) {
+      document.getElementById("content").textContent = "";
+      // const accessTokenResponse = await generateAccessToken();
+      const accessTokenResponse = await generateAccessTokenStage();
+      const accessTokenJson = await accessTokenResponse.json();
+      const accessToken = accessTokenJson.access_token;
+      createPreElement("accessToken: " + accessToken);
+      createPreElement("------------------");
+
+      // const createOrderResponse = await createOrder(accessToken);
+      const createOrderResponse = await createOrderStage(accessToken);
+      const createOrderResponseJson = await createOrderResponse.json();
+      const orderId = createOrderResponseJson.id;
+      createPreElement("order id " + orderId);
+      console.log("order id ", orderId);
+
+      createPreElement("------------------");
+
+      // const authorizeOrderRes = await authorizeOrder(orderId, accessToken);
+      const authorizeOrderRes = await captureOrderStage(
+        orderId,
+        accessToken,
+        status
+      );
+      const authorizeOrderResJson = await authorizeOrderRes.json();
+      const url = authorizeOrderResJson.links.find(
+        (link) => link.rel === "payer-action"
+      ).href;
+      console.log("helios url ", url);
+      createPreElement("helios url " + url);
+      createPreElement("------------------");
+
+      const queryParams = parseQuery(url.split("?")[1]);
+      window.heliosurl = url;
+      window.paypal
+        .GooglePay()
+        .confirmOrder(orderId, accessToken)
+        .then((res) => {
+          console.log("then block");
+          console.log("res", res);
+          if (status === "fail") {
+            createPreElement("Failure Scenario");
+            createPreElement('<p styles="color:red">Failed</p>');
+          } else {
+            createPreElement("success Scenario");
+          }
+          createPreElement(res);
+        })
+        .catch((err) => console.log("in catch block", err));
+      createPreElement("Launching Zoid Component");
+    }
+  </script>
+  <body>
+    <h1>Click the button below to start the flow</h1>
+    <button onclick="onLaunch()">Success Flow</button>
+    <button onclick="onLaunch('fail')">Failure Flow</button>
+    <div id="content"></div>
+    <br />
+  </body>
+</html>
