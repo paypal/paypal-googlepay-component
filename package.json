@@ -22,9 +22,6 @@
   },
   "jest": {
     "coverageDirectory": "./coverage/",
-    "setupFiles": [
-      "dotenv/config"
-    ],
     "restoreMocks": true,
     "testEnvironment": "jsdom",
     "transformIgnorePatterns": [
