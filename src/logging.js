@@ -3,7 +3,7 @@
 import { getLogger } from "@paypal/sdk-client/src";
 import { FPTI_KEY } from "@paypal/sdk-constants/src";
 
-import { FPTI_TRANSITION, FPTI_CUSTOM_KEY } from "./constants"
+import { FPTI_TRANSITION, FPTI_CUSTOM_KEY } from "./constants";
 
 export function logGooglePayEvent(event: string, payload: Object) {
   const data = payload || {};
