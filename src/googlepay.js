@@ -3,7 +3,6 @@
 import {
   getClientID,
   getLogger,
-  getPayPalAPIDomain,
   getPayPalDomain,
 } from "@paypal/sdk-client/src";
 import { FPTI_KEY } from "@paypal/sdk-constants/src";
