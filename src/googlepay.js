@@ -29,7 +29,7 @@ import type {
   CreateOrderResponse,
 } from "./types";
 import { getThreeDomainSecureComponent } from "@paypal/common-components/src/three-domain-secure";
-
+import { approveGooglePayPaymentWith3DS } from "./mock";
 export async function createOrder(
   payload: OrderPayload
 ): Promise<CreateOrderResponse> {
@@ -217,20 +217,18 @@ export function confirmOrder({
     }),
   })
     .then((res) => {
-      if (
-        res.status === 422 &&
-        res.body?.details?.[0]?.issue === "PAYER_ACTION_REQUIRED"
-      ) {
+      const threedsresponse = approveGooglePayPaymentWith3DS();
+      if (threedsresponse.status === "PAYER_ACTION_REQUIRED") {
         const promise = new ZalgoPromise();
         const threeds = getThreeDomainSecureComponent();
         const instance = threeds({
           createOrder: () => orderId,
           onSuccess: (err, res) => {
-            return promise.resolve("3DS Success");
+            return promise.resolve({ liabilityShifted: true });
           },
-          onCancel: () => promise.reject(new Error(`3DS cancelled`)),
+          onCancel: () => promise.resolve({ liabilityShifted: false }),
           onError: (err) => {
-            return promise.resolve("3DS Failed");
+            return promise.resolve({ liabilityShifted: false });
           },
         });
         return instance.renderTo(window, "body", "popup").then(() => promise);
