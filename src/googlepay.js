@@ -3,7 +3,7 @@
 import {
   getClientID,
   getLogger,
-  getPayPalDomain,
+  getPayPalDomain
 } from "@paypal/sdk-client/src";
 import { FPTI_KEY } from "@paypal/sdk-constants/src";
 import { ZalgoPromise } from "@krakenjs/zalgo-promise/src";
@@ -13,7 +13,7 @@ import {
   FPTI_TRANSITION,
   FPTI_CUSTOM_KEY,
   DEFAULT_GQL_HEADERS,
-  DEFAULT_API_HEADERS,
+  DEFAULT_API_HEADERS
 } from "./constants";
 import { logGooglePayEvent } from "./logging";
 import type {
@@ -22,7 +22,7 @@ import type {
   ConfirmOrderParams,
   ApprovePaymentResponse,
   OrderPayload,
-  CreateOrderResponse,
+  CreateOrderResponse
 } from "./types";
 
 import { getThreeDomainSecureComponent } from "@paypal/common-components/src/three-domain-secure";
@@ -39,12 +39,12 @@ export async function createOrder(
       {
         method: "POST",
         headers: {
-          Authorization: `Basic ${basicAuth}`,
+          Authorization: `Basic ${basicAuth}`
         },
-        body: "grant_type=client_credentials",
+        body: "grant_type=client_credentials"
       }
     )
-      .then((res) => {
+      .then(res => {
         return res.json();
       })
       .then(({ access_token }) => {
@@ -57,11 +57,11 @@ export async function createOrder(
         method: "POST",
         headers: {
           ...DEFAULT_API_HEADERS,
-          Authorization: `Bearer ${accessToken}`,
+          Authorization: `Bearer ${accessToken}`
         },
-        body: JSON.stringify(payload),
+        body: JSON.stringify(payload)
       }
-    ).catch((err) => {
+    ).catch(err => {
       throw err;
     });
 
@@ -69,14 +69,14 @@ export async function createOrder(
 
     return {
       id,
-      status,
+      status
     };
   } catch (error) {
     getLogger()
       .error(FPTI_TRANSITION.GOOGLEPAY_CREATE_ORDER_ERROR)
       .track({
         [FPTI_KEY.TRANSITION]: FPTI_TRANSITION.GOOGLEPAY_CREATE_ORDER_ERROR,
-        [FPTI_CUSTOM_KEY.ERR_DESC]: `Error: ${error.message}) }`,
+        [FPTI_CUSTOM_KEY.ERR_DESC]: `Error: ${error.message}) }`
       })
       .flush();
     throw error;
@@ -90,7 +90,7 @@ export function googlePayConfig(): Promise<
   return fetch(`${getPayPalDomain()}/graphql?GetGooglePayConfig`, {
     method: "POST",
     headers: {
-      ...DEFAULT_GQL_HEADERS,
+      ...DEFAULT_GQL_HEADERS
     },
     body: JSON.stringify({
       query: `
@@ -129,11 +129,11 @@ export function googlePayConfig(): Promise<
                     }`,
       variables: {
         clientId: getClientID(),
-        merchantOrigin: getMerchantDomain(),
-      },
-    }),
+        merchantOrigin: getMerchantDomain()
+      }
+    })
   })
-    .then((res) => {
+    .then(res => {
       if (!res.ok) {
         const { headers } = res;
         throw new PayPalGooglePayError(
@@ -156,12 +156,12 @@ export function googlePayConfig(): Promise<
 
       return data.googlePayConfig;
     })
-    .catch((err) => {
+    .catch(err => {
       getLogger()
         .error(FPTI_TRANSITION.GOOGLEPAY_CONFIG_ERROR)
         .track({
           [FPTI_KEY.TRANSITION]: FPTI_TRANSITION.GOOGLEPAY_CONFIG_ERROR,
-          [FPTI_CUSTOM_KEY.ERR_DESC]: `Error: ${err.message}) }`,
+          [FPTI_CUSTOM_KEY.ERR_DESC]: `Error: ${err.message}) }`
         })
         .flush();
 
@@ -173,7 +173,7 @@ export function confirmOrder({
   orderId,
   paymentMethodData,
   shippingAddress,
-  email,
+  email
 }: ConfirmOrderParams): Promise<
   ApprovePaymentResponse | PayPalGooglePayErrorType
 > {
@@ -182,7 +182,7 @@ export function confirmOrder({
   return fetch(`${getPayPalDomain()}/graphql?ApproveGooglePayPayment`, {
     method: "POST",
     headers: {
-      ...DEFAULT_GQL_HEADERS,
+      ...DEFAULT_GQL_HEADERS
     },
     body: JSON.stringify({
       query: `
@@ -206,11 +206,11 @@ export function confirmOrder({
         clientID: getClientID(),
         orderID: orderId,
         shippingAddress,
-        email,
-      },
-    }),
+        email
+      }
+    })
   })
-    .then((res) => {
+    .then(res => {
       const threedsresponse = approveGooglePayPaymentWith3DS();
       if (threedsresponse.status === "PAYER_ACTION_REQUIRED") {
         const promise = new ZalgoPromise();
@@ -221,39 +221,50 @@ export function confirmOrder({
             return promise.resolve({ liabilityShifted: true });
           },
           onCancel: () => promise.resolve({ liabilityShifted: false }),
-          onError: (err) => {
+          onError: err => {
             return promise.resolve({ liabilityShifted: false });
-          },
+          }
         });
         return instance.renderTo(window, "body", "popup").then(() => promise);
       }
       if (!res.ok) {
         const { headers } = res;
+        const error = {
+          name: "INTERNAL_SERVER_ERROR",
+          fullDescription: "An internal server error has occurred",
+          paypalDebugId: headers.get("Paypal-Debug-Id")
+        };
+
         throw new PayPalGooglePayError(
-          "INTERNAL_SERVER_ERROR",
-          "An internal server error has occurred",
-          headers.get("Paypal-Debug-Id")
+          error.name,
+          error.fullDescription,
+          error.paypalDebugId
         );
       }
       return res.json();
     })
     .then(({ data, errors, extensions }) => {
       if (Array.isArray(errors) && errors.length) {
-        const message = errors[0]?.message ?? JSON.stringify(errors[0]);
+        const error = {
+          name: errors[0]?.name || "GOOGLEPAY_PAYMENT_ERROR",
+          fullDescription: errors[0]?.message ?? JSON.stringify(errors[0]),
+          paypalDebugId: extensions?.correlationId
+        };
+
         throw new PayPalGooglePayError(
-          "GOOGLEPAY_CONFIG_ERROR",
-          message,
-          extensions?.correlationId
+          error.name,
+          error.fullDescription,
+          error.paypalDebugId
         );
       }
       return data.approveGooglePayPayment;
     })
-    .catch((err) => {
+    .catch(err => {
       getLogger()
-        .error(FPTI_TRANSITION.GOOGLEPAY_CONFIG_ERROR)
+        .error(FPTI_TRANSITION.GOOGLEPAY_PAYMENT_ERROR)
         .track({
-          [FPTI_KEY.TRANSITION]: FPTI_TRANSITION.GOOGLEPAY_CONFIG_ERROR,
-          [FPTI_CUSTOM_KEY.ERR_DESC]: `Error: ${err.message}) }`,
+          [FPTI_KEY.TRANSITION]: FPTI_TRANSITION.GOOGLEPAY_PAYMENT_ERROR,
+          [FPTI_CUSTOM_KEY.ERR_DESC]: `Error: ${err.message}) }`
         })
         .flush();
 

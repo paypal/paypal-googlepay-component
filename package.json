@@ -107,7 +107,6 @@
     "standard-version": "^9.3.2"
   },
   "dependencies": {
-    "@krakenjs/cross-domain-utils": "^3.0.0",
     "@krakenjs/zalgo-promise": "^2.0.0",
     "@paypal/common-components": "^1.0.35",
     "@paypal/sdk-client": "^4.0.166",
@@ -117,8 +116,5 @@
   },
   "lint-staged": {
     "**/*": "prettier --write --ignore-unknown"
-  },
-  "directories": {
-    "test": "test"
   }
 }
