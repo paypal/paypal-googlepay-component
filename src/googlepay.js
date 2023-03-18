@@ -1,18 +1,14 @@
 /* @flow */
 
-import { getClientID, getLogger } from "@paypal/sdk-client/src";
-import { FPTI_KEY } from "@paypal/sdk-constants/src";
-import { ZalgoPromise } from "@krakenjs/zalgo-promise/src";
-
-import { PayPalGooglePayError } from "./util";
 import {
   getClientID,
   getLogger,
-  getPayPalAPIDomain,
+  getPayPalDomain,
 } from "@paypal/sdk-client/src";
 import { FPTI_KEY } from "@paypal/sdk-constants/src";
+import { ZalgoPromise } from "@krakenjs/zalgo-promise/src";
 
-import { PayPalGooglePayError } from "./util";
+import { PayPalGooglePayError, getMerchantDomain } from "./util";
 import {
   FPTI_TRANSITION,
   FPTI_CUSTOM_KEY,
@@ -28,8 +24,10 @@ import type {
   OrderPayload,
   CreateOrderResponse,
 } from "./types";
+
 import { getThreeDomainSecureComponent } from "@paypal/common-components/src/three-domain-secure";
 import { approveGooglePayPaymentWith3DS } from "./mock";
+
 export async function createOrder(
   payload: OrderPayload
 ): Promise<CreateOrderResponse> {
@@ -89,9 +87,7 @@ export function googlePayConfig(): Promise<
   ConfigResponse | PayPalGooglePayErrorType
 > {
   logGooglePayEvent("GetApplepayConfig");
-  const host = "https://www.te-gpay-api-e2e.qa.paypal.com";
-  const localHost = "https://localhost.paypal.com:9000";
-  return fetch(`${localHost}/graphql?GetGooglePayConfig`, {
+  return fetch(`${getPayPalDomain()}/graphql?GetGooglePayConfig`, {
     method: "POST",
     headers: {
       ...DEFAULT_GQL_HEADERS,
@@ -132,9 +128,8 @@ export function googlePayConfig(): Promise<
                         }
                     }`,
       variables: {
-        clientId:
-          "B_AMvrD5p50dtQXhxF2gaQYxM3zxsQP6RVTLfx1JN5aGgPSDy1zR-EonK0ED3DZlxfyi28odj2IR1pnJBk",
-        merchantOrigin: "https://stage-googlepay-paypal-js-sdk.herokuapp.com",
+        clientId: getClientID(),
+        merchantOrigin: getMerchantDomain(),
       },
     }),
   })
@@ -183,9 +178,8 @@ export function confirmOrder({
   ApprovePaymentResponse | PayPalGooglePayErrorType
 > {
   logGooglePayEvent("paymentauthorized");
-  const host = "https://www.te-gpay-api-e2e.qa.paypal.com";
-  const localHost = "https://localhost.paypal.com:9000";
-  return fetch(`${localHost}/graphql?ApproveGooglePayPayment`, {
+
+  return fetch(`${getPayPalDomain()}/graphql?ApproveGooglePayPayment`, {
     method: "POST",
     headers: {
       ...DEFAULT_GQL_HEADERS,
@@ -252,8 +246,7 @@ export function confirmOrder({
           extensions?.correlationId
         );
       }
-
-      return data.googlePayConfig;
+      return data.approveGooglePayPayment;
     })
     .catch((err) => {
       getLogger()

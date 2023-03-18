@@ -3,22 +3,34 @@
   "version": "1.0.0",
   "description": "A Web Component for GooglePay Integration",
   "main": "index.js",
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "flow-typed": "flow-typed install",
     "flow": "flow",
     "flow:build": "flow gen-flow-files ./src/index.js --out-dir ./dist/module",
     "format": "npx prettier --write .",
     "format:check": "npx prettier --check .",
-    "test:unit": "jest src/ --collectCoverage --collectCoverageFrom='src/' --testPathIgnorePatterns=/fixtures/ --no-cache --runInBand",
+    "test:unit": "NODE_TLS_REJECT_UNAUTHORIZED=0  jest src/ --collectCoverage --collectCoverageFrom='src/' --testPathIgnorePatterns=/fixtures/ --no-cache --runInBand",
     "lint": "eslint --fix src/*.js",
     "test": "npm run format:check && npm run lint && npm run flow && npm run test:unit",
-    "babel": "babel src/ --out-dir dist/module",
-    "webpack": "babel-node --plugins=transform-es2015-modules-commonjs ./node_modules/.bin/webpack --progress",
     "build": "npm run test",
     "prepare": "husky install",
     "prerelease": "npm run clean && npm run build && git add dist && git commit -m 'ci: check in dist folder' || echo 'Nothing to distribute'",
     "release": "standard-version",
     "postrelease": "git push && git push --follow-tags && npm publish"
+  },
+  "jest": {
+    "coverageDirectory": "./coverage/",
+    "restoreMocks": true,
+    "testEnvironment": "jsdom",
+    "transformIgnorePatterns": [
+      "node_modules/(?!(@paypal|@krakenjs|get-browser-fingerprint))"
+    ],
+    "globals": {
+      "__DEBUG__": true
+    }
   },
   "standard-version": {
     "types": [
