@@ -107,8 +107,12 @@
     "standard-version": "^9.3.2"
   },
   "dependencies": {
+    "@krakenjs/zalgo-promise": "^2.0.0",
+    "@paypal/common-components": "^1.0.35",
     "@paypal/sdk-client": "^4.0.166",
-    "@paypal/sdk-constants": "^1.0.129"
+    "@paypal/sdk-constants": "^1.0.129",
+    "@krakenjs/post-robot": "^11.0.0",
+    "@krakenjs/zoid": "^10.0.0"
   },
   "lint-staged": {
     "**/*": "prettier --write --ignore-unknown"
