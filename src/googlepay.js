@@ -247,6 +247,7 @@ export function confirmOrder({
       const { status } = approveGooglePayPayment;
       const promise = new ZalgoPromise();
       if (status === "APPROVED") {
+        // $FlowIssue - need to fix this type
         const threeds: GooglePayTDSComponent = getThreeDomainSecureComponent();
         const instance = threeds({
           createOrder: () => "35W41291LJ903173X",
@@ -260,6 +261,8 @@ export function confirmOrder({
             return promise.resolve(approveGooglePayPayment);
           },
         });
+
+        // $FlowIssue - need to fix this type
         return instance.renderTo(window, "body", "popup").then(() => promise);
       }
       if (Array.isArray(errors) && errors.length) {

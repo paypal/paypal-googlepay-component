@@ -29,7 +29,9 @@
       "node_modules/(?!(@paypal|@krakenjs|get-browser-fingerprint))"
     ],
     "globals": {
-      "__DEBUG__": true
+      "__DEBUG__": true,
+      "__TEST__": true,
+      "__POST_ROBOT__": {}
     }
   },
   "standard-version": {
