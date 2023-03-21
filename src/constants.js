@@ -42,3 +42,5 @@ export const ORDER_INTENT = {
   CAPTURE: "CAPTURE",
   AUTHORIZE: "AUTHORIZE",
 };
+
+export const LOCAL_HOST = "https://localhost.paypal.com:9000";

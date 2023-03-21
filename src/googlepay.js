@@ -3,17 +3,20 @@
 import {
   getClientID,
   getLogger,
-  getPayPalDomain
+  getPayPalDomain,
 } from "@paypal/sdk-client/src";
 import { FPTI_KEY } from "@paypal/sdk-constants/src";
 import { ZalgoPromise } from "@krakenjs/zalgo-promise/src";
+import { getThreeDomainSecureComponent } from "@paypal/common-components/src/three-domain-secure";
+import { type ZoidComponent } from "@krakenjs/zoid/src";
 
 import { PayPalGooglePayError, getMerchantDomain } from "./util";
 import {
   FPTI_TRANSITION,
   FPTI_CUSTOM_KEY,
   DEFAULT_GQL_HEADERS,
-  DEFAULT_API_HEADERS
+  DEFAULT_API_HEADERS,
+  LOCAL_HOST,
 } from "./constants";
 import { logGooglePayEvent } from "./logging";
 import type {
@@ -22,11 +25,17 @@ import type {
   ConfirmOrderParams,
   ApprovePaymentResponse,
   OrderPayload,
-  CreateOrderResponse
+  CreateOrderResponse,
 } from "./types";
 
-import { getThreeDomainSecureComponent } from "@paypal/common-components/src/three-domain-secure";
-import { approveGooglePayPaymentWith3DS } from "./mock";
+type GooglePayTDSProps = {|
+  onSuccess: () => ZalgoPromise<ApprovePaymentResponse>,
+  onError: (mixed) => ZalgoPromise<ApprovePaymentResponse>,
+  onCancel: () => ZalgoPromise<ApprovePaymentResponse>,
+  createOrder: () => string,
+|};
+
+type GooglePayTDSComponent = ZoidComponent<GooglePayTDSProps>;
 
 export async function createOrder(
   payload: OrderPayload
@@ -39,12 +48,12 @@ export async function createOrder(
       {
         method: "POST",
         headers: {
-          Authorization: `Basic ${basicAuth}`
+          Authorization: `Basic ${basicAuth}`,
         },
-        body: "grant_type=client_credentials"
+        body: "grant_type=client_credentials",
       }
     )
-      .then(res => {
+      .then((res) => {
         return res.json();
       })
       .then(({ access_token }) => {
@@ -57,11 +66,11 @@ export async function createOrder(
         method: "POST",
         headers: {
           ...DEFAULT_API_HEADERS,
-          Authorization: `Bearer ${accessToken}`
+          Authorization: `Bearer ${accessToken}`,
         },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(payload),
       }
-    ).catch(err => {
+    ).catch((err) => {
       throw err;
     });
 
@@ -69,14 +78,14 @@ export async function createOrder(
 
     return {
       id,
-      status
+      status,
     };
   } catch (error) {
     getLogger()
       .error(FPTI_TRANSITION.GOOGLEPAY_CREATE_ORDER_ERROR)
       .track({
         [FPTI_KEY.TRANSITION]: FPTI_TRANSITION.GOOGLEPAY_CREATE_ORDER_ERROR,
-        [FPTI_CUSTOM_KEY.ERR_DESC]: `Error: ${error.message}) }`
+        [FPTI_CUSTOM_KEY.ERR_DESC]: `Error: ${error.message}) }`,
       })
       .flush();
     throw error;
@@ -87,13 +96,15 @@ export function googlePayConfig(): Promise<
   ConfigResponse | PayPalGooglePayErrorType
 > {
   logGooglePayEvent("GetApplepayConfig");
-  return fetch(`${getPayPalDomain()}/graphql?GetGooglePayConfig`, {
-    method: "POST",
-    headers: {
-      ...DEFAULT_GQL_HEADERS
-    },
-    body: JSON.stringify({
-      query: `
+  return fetch(
+    `${LOCAL_HOST || getPayPalDomain()}/graphql?GetGooglePayConfig`,
+    {
+      method: "POST",
+      headers: {
+        ...DEFAULT_GQL_HEADERS,
+      },
+      body: JSON.stringify({
+        query: `
                     query getGooglePayConfig(
                         $clientId: String!
                         $merchantOrigin: String!
@@ -127,13 +138,14 @@ export function googlePayConfig(): Promise<
                         }
                         }
                     }`,
-      variables: {
-        clientId: getClientID(),
-        merchantOrigin: getMerchantDomain()
-      }
-    })
-  })
-    .then(res => {
+        variables: {
+          clientId: getClientID(),
+          merchantOrigin: getMerchantDomain(),
+        },
+      }),
+    }
+  )
+    .then((res) => {
       if (!res.ok) {
         const { headers } = res;
         throw new PayPalGooglePayError(
@@ -156,12 +168,12 @@ export function googlePayConfig(): Promise<
 
       return data.googlePayConfig;
     })
-    .catch(err => {
+    .catch((err) => {
       getLogger()
         .error(FPTI_TRANSITION.GOOGLEPAY_CONFIG_ERROR)
         .track({
           [FPTI_KEY.TRANSITION]: FPTI_TRANSITION.GOOGLEPAY_CONFIG_ERROR,
-          [FPTI_CUSTOM_KEY.ERR_DESC]: `Error: ${err.message}) }`
+          [FPTI_CUSTOM_KEY.ERR_DESC]: `Error: ${err.message}) }`,
         })
         .flush();
 
@@ -173,19 +185,21 @@ export function confirmOrder({
   orderId,
   paymentMethodData,
   shippingAddress,
-  email
+  email,
 }: ConfirmOrderParams): Promise<
   ApprovePaymentResponse | PayPalGooglePayErrorType
 > {
   logGooglePayEvent("paymentauthorized");
 
-  return fetch(`${getPayPalDomain()}/graphql?ApproveGooglePayPayment`, {
-    method: "POST",
-    headers: {
-      ...DEFAULT_GQL_HEADERS
-    },
-    body: JSON.stringify({
-      query: `
+  return fetch(
+    `${LOCAL_HOST || getPayPalDomain()}/graphql?ApproveGooglePayPayment`,
+    {
+      method: "POST",
+      headers: {
+        ...DEFAULT_GQL_HEADERS,
+      },
+      body: JSON.stringify({
+        query: `
                     mutation ApproveGooglePayPayment(
                       $paymentMethodData: GooglePayPaymentMethodData!
                       $orderID: String!
@@ -201,38 +215,23 @@ export function confirmOrder({
                         email: $email
                       )
                     }`,
-      variables: {
-        paymentMethodData,
-        clientID: getClientID(),
-        orderID: orderId,
-        shippingAddress,
-        email
-      }
-    })
-  })
-    .then(res => {
-      const threedsresponse = approveGooglePayPaymentWith3DS();
-      if (threedsresponse.status === "PAYER_ACTION_REQUIRED") {
-        const promise = new ZalgoPromise();
-        const threeds = getThreeDomainSecureComponent();
-        const instance = threeds({
-          createOrder: () => orderId,
-          onSuccess: (err, res) => {
-            return promise.resolve({ liabilityShifted: true });
-          },
-          onCancel: () => promise.resolve({ liabilityShifted: false }),
-          onError: err => {
-            return promise.resolve({ liabilityShifted: false });
-          }
-        });
-        return instance.renderTo(window, "body", "popup").then(() => promise);
-      }
+        variables: {
+          paymentMethodData,
+          clientID: getClientID(),
+          orderID: orderId,
+          shippingAddress,
+          email,
+        },
+      }),
+    }
+  )
+    .then((res) => {
       if (!res.ok) {
         const { headers } = res;
         const error = {
           name: "INTERNAL_SERVER_ERROR",
           fullDescription: "An internal server error has occurred",
-          paypalDebugId: headers.get("Paypal-Debug-Id")
+          paypalDebugId: headers.get("Paypal-Debug-Id"),
         };
 
         throw new PayPalGooglePayError(
@@ -244,11 +243,30 @@ export function confirmOrder({
       return res.json();
     })
     .then(({ data, errors, extensions }) => {
+      const approveGooglePayPayment = data.approveGooglePayPayment;
+      const { status } = approveGooglePayPayment;
+      const promise = new ZalgoPromise();
+      if (status === "APPROVED") {
+        const threeds: GooglePayTDSComponent = getThreeDomainSecureComponent();
+        const instance = threeds({
+          createOrder: () => "35W41291LJ903173X",
+          onSuccess: () => {
+            return promise.resolve(approveGooglePayPayment);
+          },
+          onCancel: () => {
+            return promise.resolve(approveGooglePayPayment);
+          },
+          onError: () => {
+            return promise.resolve(approveGooglePayPayment);
+          },
+        });
+        return instance.renderTo(window, "body", "popup").then(() => promise);
+      }
       if (Array.isArray(errors) && errors.length) {
         const error = {
           name: errors[0]?.name || "GOOGLEPAY_PAYMENT_ERROR",
           fullDescription: errors[0]?.message ?? JSON.stringify(errors[0]),
-          paypalDebugId: extensions?.correlationId
+          paypalDebugId: extensions?.correlationId,
         };
 
         throw new PayPalGooglePayError(
@@ -257,14 +275,14 @@ export function confirmOrder({
           error.paypalDebugId
         );
       }
-      return data.approveGooglePayPayment;
+      return approveGooglePayPayment;
     })
-    .catch(err => {
+    .catch((err) => {
       getLogger()
         .error(FPTI_TRANSITION.GOOGLEPAY_PAYMENT_ERROR)
         .track({
           [FPTI_KEY.TRANSITION]: FPTI_TRANSITION.GOOGLEPAY_PAYMENT_ERROR,
-          [FPTI_CUSTOM_KEY.ERR_DESC]: `Error: ${err.message}) }`
+          [FPTI_CUSTOM_KEY.ERR_DESC]: `Error: ${err.message}) }`,
         })
         .flush();
 
