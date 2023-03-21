@@ -43,4 +43,4 @@ export const ORDER_INTENT = {
   AUTHORIZE: "AUTHORIZE",
 };
 
-export const LOCAL_HOST = "https://localhost.paypal.com:9000";
+export const LOCAL_HOST = "";
