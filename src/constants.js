@@ -26,6 +26,8 @@ export const FPTI_TRANSITION = {
   GOOGLEPAY_FLOW_ERROR: ("googlepay_flow_error": "googlepay_flow_error"),
   GOOGLEPAY_CREATE_ORDER_ERROR:
     ("googlepay_create_order_error": "googlepay_create_order_error"),
+  GOOGLEPAY_GET_ORDER_ERROR:
+    ("googlepay_get_order_error": "googlepay_get_order_error"), 
   GOOGLEPAY_ON_CLICK_INVALID:
     ("googlepay_onclick_invalid": "googlepay_onclick_invalid"),
   GOOGLEPAY_PAYMENT_ERROR:
@@ -43,4 +45,4 @@ export const ORDER_INTENT = {
   AUTHORIZE: "AUTHORIZE",
 };
 
-export const LOCAL_HOST = "";
+export const LOCAL_HOST = "https://localhost.paypal.com:9000";

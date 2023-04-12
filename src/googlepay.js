@@ -8,8 +8,6 @@ import {
 import { FPTI_KEY } from "@paypal/sdk-constants/src";
 import { ZalgoPromise } from "@krakenjs/zalgo-promise/src";
 import { getThreeDomainSecureComponent } from "@paypal/common-components/src/three-domain-secure";
-import { type ZoidComponent } from "@krakenjs/zoid/src";
-
 import { PayPalGooglePayError, getMerchantDomain } from "./util";
 import {
   FPTI_TRANSITION,
@@ -26,16 +24,8 @@ import type {
   ApprovePaymentResponse,
   OrderPayload,
   CreateOrderResponse,
+  InitiatePayerActionParams
 } from "./types";
-
-type GooglePayTDSProps = {|
-  onSuccess: () => ZalgoPromise<ApprovePaymentResponse>,
-  onError: (mixed) => ZalgoPromise<ApprovePaymentResponse>,
-  onCancel: () => ZalgoPromise<ApprovePaymentResponse>,
-  createOrder: () => string,
-|};
-
-type GooglePayTDSComponent = ZoidComponent<GooglePayTDSProps>;
 
 export async function createOrder(
   payload: OrderPayload
@@ -243,25 +233,6 @@ export function confirmOrder({
       return res.json();
     })
     .then(({ data, errors, extensions }) => {
-      const approveGooglePayPayment = data.approveGooglePayPayment;
-      const { status } = approveGooglePayPayment;
-      const promise = new ZalgoPromise();
-      if (status === "APPROVED") {
-        const threeds: GooglePayTDSComponent = getThreeDomainSecureComponent();
-        const instance = threeds({
-          createOrder: () => "35W41291LJ903173X",
-          onSuccess: () => {
-            return promise.resolve(approveGooglePayPayment);
-          },
-          onCancel: () => {
-            return promise.resolve(approveGooglePayPayment);
-          },
-          onError: () => {
-            return promise.resolve(approveGooglePayPayment);
-          },
-        });
-        return instance.renderTo(window, "body", "popup").then(() => promise);
-      }
       if (Array.isArray(errors) && errors.length) {
         const error = {
           name: errors[0]?.name || "GOOGLEPAY_PAYMENT_ERROR",
@@ -275,7 +246,7 @@ export function confirmOrder({
           error.paypalDebugId
         );
       }
-      return approveGooglePayPayment;
+      return data.approveGooglePayPayment;
     })
     .catch((err) => {
       getLogger()
@@ -288,4 +259,106 @@ export function confirmOrder({
 
       throw err;
     });
+}
+
+/**
+ * Intiate 3DS Flow for User
+ */
+export function intiatePayerAction({
+  orderId
+}: InitiatePayerActionParams): ZalgoPromise<ApprovePaymentResponse>{
+
+        const promise = new ZalgoPromise();
+        const threeds = getThreeDomainSecureComponent();
+        const instance = threeds({
+          createOrder: () => orderId,
+          onSuccess: async () => {
+            console.log("TDS Successful");
+            const order =  await fetchOrder(orderId)
+            console.log(order)
+            return promise.resolve({
+              id: orderId,
+              status: 'APPROVED',
+              payment_source: {},
+              links:[]
+          });
+          },
+          onCancel: () => {
+            logGooglePayEvent("TDS Cancelled");
+            return promise.resolve({
+              id: orderId,
+              status: 'APPROVED',
+              payment_source: {},
+              links:[]
+          });
+          },
+          onError: () => {
+            logGooglePayEvent("TDS Error");
+            return promise.resolve({
+              id: orderId,
+              status: 'APPROVED',
+              payment_source: {},
+              links:[]
+          });
+          },
+        });
+
+        return instance.renderTo(window, "body").then(() => promise);
+
+}
+
+/**
+ * Get Order To Check for Liability Shift
+ */
+export async function fetchOrder(
+  orderId: string
+): Promise<CreateOrderResponse> {
+  const basicAuth = btoa(`${getClientID()}`);
+
+  try {
+    const accessToken = await fetch(
+      `https://api.te-gpay-api-e2e.qa.paypal.com/v1/oauth2/token`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Basic ${basicAuth}`,
+        },
+        body: "grant_type=client_credentials",
+      }
+    )
+      .then((res) => {
+        return res.json();
+      })
+      .then(({ access_token }) => {
+        return access_token;
+      });
+
+    const res = await fetch(
+      `https://api.te-gpay-api-e2e.qa.paypal.com/v2/checkout/orders/${orderId}`,
+      {
+        method: "GET",
+        headers: {
+          ...DEFAULT_API_HEADERS,
+          Authorization: `Bearer ${accessToken}`,
+        }
+      }
+    ).catch((err) => {
+      throw err;
+    });
+
+    const orderDetails = await res.json();
+
+    return {
+     ...orderDetails
+    };
+  } catch (error) {
+    getLogger()
+      .error(FPTI_TRANSITION.GOOGLEPAY_GET_ORDER_ERROR)
+      .track({
+        [FPTI_KEY.TRANSITION]: FPTI_TRANSITION.GOOGLEPAY_GET_ORDER_ERROR,
+        [FPTI_CUSTOM_KEY.ERR_DESC]: `Error: ${error.message}) }`,
+      })
+      .flush();
+    throw error;
+  }
 }

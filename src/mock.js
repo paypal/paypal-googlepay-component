@@ -30,8 +30,6 @@ export function googlePayConfig(): any {
       merchantId: "12345678901234567890",
       merchantOrigin: "stage-googlepay-paypal-js-sdk.herokuapp.com",
       merchantName: "paypal",
-      authJwt:
-        "eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJtZXJjaGFudElkIjoiNkpUUUhMVjRRSDlUSiIsIm1lcmNoYW50T3JpZ2luIjoic3RhZ2UtZ29vZ2xlcGF5LXBheXBhbC1qcy1zZGsuaGVyb2t1YXBwLmNvbSIsImlhdCI6MTY3NzgwMzYxNn0.yrfBfux_KtpMoUXZTDkwVyQN02aiI4cKOGgUvwkjr5K7SsCYf51nGmMpDBT2RYw4XHHDokwGO2IBfok_CIoWwA",
     },
   };
 }

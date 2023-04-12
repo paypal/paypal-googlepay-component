@@ -112,3 +112,7 @@ export type GooglePayType = {|
     ApprovePaymentResponse | PayPalGooglePayErrorType
   >,
 |};
+
+export type InitiatePayerActionParams = {|
+  orderId: string,  
+|}
