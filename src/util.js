@@ -25,16 +25,12 @@ export function getMerchantDomain(): string {
   return url.split("//")[1];
 }
 
-function isLocalhost(): boolean {
-  return window.location.host.includes("localhost");
-}
-
 export function getPayPalDomain(): string {
-  return isLocalhost() ? LOCAL_HOST : getDefaultPayPalDomain();
+  return getEnv() === ENV.LOCAL ? LOCAL_HOST : getDefaultPayPalDomain();
 }
 
 export function getPayPalAPIDomain(): string {
-  return isLocalhost() ? API_HOST : getDefaultPayPalAPIDomain();
+  return getEnv() === ENV.LOCAL ? API_HOST : getDefaultPayPalAPIDomain();
 }
 
 export function getConfigQuery(): string {
