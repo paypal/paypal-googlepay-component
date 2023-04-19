@@ -1,6 +1,6 @@
 {
   "name": "@paypal/googlepay-components",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A Web Component for GooglePay Integration",
   "main": "index.js",
   "publishConfig": {
@@ -29,7 +29,9 @@
       "node_modules/(?!(@paypal|@krakenjs|get-browser-fingerprint))"
     ],
     "globals": {
-      "__DEBUG__": true
+      "__DEBUG__": true,
+      "__TEST__": true,
+      "__POST_ROBOT__": {}
     }
   },
   "standard-version": {
