@@ -27,12 +27,15 @@ export const FPTI_TRANSITION = {
   GOOGLEPAY_CREATE_ORDER_ERROR:
     ("googlepay_create_order_error": "googlepay_create_order_error"),
   GOOGLEPAY_GET_ORDER_ERROR:
-    ("googlepay_get_order_error": "googlepay_get_order_error"), 
+    ("googlepay_get_order_error": "googlepay_get_order_error"),
   GOOGLEPAY_ON_CLICK_INVALID:
     ("googlepay_onclick_invalid": "googlepay_onclick_invalid"),
   GOOGLEPAY_PAYMENT_ERROR:
     ("googlepay_payment_error": "googlepay_payment_error"),
   GOOGLEPAY_CONFIG_ERROR: ("googlepay_config_error": "googlepay_config_error"),
+  GOOGLEPAY_TDS_SUCCESS: ("googlepay_tds_success": "googlepay_tds_success"),
+  GOOGLEPAY_TDS_CANCEL: ("googlepay_tds_cancel": "googlepay_tds_cancel"),
+  GOOGLEPAY_TDS_ERROR: ("googlepay_tds_error": "googlepay_tds_error"),
 };
 
 export const FPTI_CUSTOM_KEY = {
@@ -46,3 +49,5 @@ export const ORDER_INTENT = {
 };
 
 export const LOCAL_HOST = "https://localhost.paypal.com:9000";
+
+export const API_HOST = `https://api.te-gpay-3ds.qa.paypal.com`;
