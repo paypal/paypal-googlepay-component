@@ -52,30 +52,6 @@ jest.mock("@paypal/sdk-constants/src", () => {
 global.fetch = fetch;
 
 describe("googlepay", () => {
-  describe("Order", () => {
-    it("Creates Order", async () => {
-      const googlepay = GooglePay();
-
-      const { id, status } = await googlepay.createOrder({
-        intent: "CAPTURE",
-        purchase_units: [
-          {
-            amount: {
-              currency_code: "USD",
-              value: "1.00",
-            },
-            payee: {
-              merchant_id: "6JTQHLV4QH9TJ",
-            },
-          },
-        ],
-      });
-
-      expect(id).toBeTruthy();
-      expect(status).toBe("CREATED");
-    });
-  });
-
   describe("Config", () => {
     it("GetGooglePayConfig", async () => {
       const googlepay = GooglePay();

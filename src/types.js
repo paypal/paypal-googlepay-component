@@ -1,4 +1,5 @@
 /* @flow */
+import type { ZalgoPromise } from "@krakenjs/zalgo-promise/src";
 
 export type OrderPayload = {|
   intent: string,
@@ -57,7 +58,7 @@ export type ApprovePaymentResponse = {|
   |}>,
 |};
 
-export type GooglePayPaymentContanct = {|
+export type GooglePayPaymentContact = {|
   name: string,
   postalCode: string,
   countryCode: string,
@@ -79,7 +80,7 @@ export type CardInfo = {|
   cardDetails: string,
   cardNetwork: string,
   assuranceDetails: AssuranceDetailsSpec,
-  billingAddress?: GooglePayPaymentContanct,
+  billingAddress?: GooglePayPaymentContact,
 |};
 
 export type GooglePayTokenizationData = {|
@@ -96,8 +97,9 @@ export type GooglePayPaymentMethodData = {|
 export type ConfirmOrderParams = {|
   paymentMethodData: GooglePayPaymentMethodData,
   orderId: string,
-  shippingAddress?: GooglePayPaymentContanct,
-  email: string,
+  shippingAddress?: GooglePayPaymentContact,
+  billingAddress?: GooglePayPaymentContact,
+  email?: string,
 |};
 
 export type CreateOrderResponse = {|
@@ -105,10 +107,16 @@ export type CreateOrderResponse = {|
   status: string,
 |};
 
+export type InitiatePayerActionParams = {|
+  orderId: string,
+|};
+
 export type GooglePayType = {|
-  createOrder(OrderPayload): Promise<CreateOrderResponse>,
   config: () => Promise<ConfigResponse | PayPalGooglePayErrorType>,
   confirmOrder: (ConfirmOrderParams) => Promise<
     ApprovePaymentResponse | PayPalGooglePayErrorType
   >,
+  intiatePayerAction: (
+    initiatePayerActionParams: InitiatePayerActionParams
+  ) => ZalgoPromise<boolean>,
 |};
