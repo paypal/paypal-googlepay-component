@@ -38,7 +38,7 @@ export function getConfigQuery(): string {
     return `
     query getGooglePayConfig(
         $clientId: String!
-        $merchantId: [String]
+        $merchantId: [String]!
         $merchantOrigin: String!
     ) {
         googlePayConfig(
@@ -77,7 +77,7 @@ export function getConfigQuery(): string {
     return `
     query getGooglePayConfig(
         $clientId: String!
-        $merchantId: [String]
+        $merchantId: [String]!
         $merchantOrigin: String!
     ) {
         googlePayConfig(
