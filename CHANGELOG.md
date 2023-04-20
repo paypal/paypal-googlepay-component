@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### 1.1.1 (2023-04-20)
+
+
+### Bug Fixes
+
+* schemaChanges for merchantID and testfix ([#9](https://github.com/paypal/paypal-googlepay-component/issues/9)) ([0a44202](https://github.com/paypal/paypal-googlepay-component/commit/0a4420213d09dd4f20614f7254b3fa65f7c6816e))
+
 ## 1.1.0 (2023-04-20)
 
 
