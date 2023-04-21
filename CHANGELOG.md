@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### 1.1.2 (2023-04-21)
+
+
+* globals and 3ds fix ([#10](https://github.com/paypal/paypal-googlepay-component/issues/10)) ([e2dbfe7](https://github.com/paypal/paypal-googlepay-component/commit/e2dbfe7171a8f78933c63190fc70f8a8a3605ba2))
+
 ### 1.1.1 (2023-04-20)
 
 
