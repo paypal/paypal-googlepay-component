@@ -189,15 +189,18 @@ export function intiatePayerAction({
     createOrder: () => orderId,
     onSuccess: (contingencyResult) => {
       logGooglePayEvent(FPTI_TRANSITION.GOOGLEPAY_TDS_SUCCESS);
-      return promise.resolve(contingencyResult);
+      return promise.resolve({
+        liabilityShift: contingencyResult.liability_shift,
+      });
     },
     onCancel: () => {
       logGooglePayEvent(FPTI_TRANSITION.GOOGLEPAY_TDS_CANCEL);
-      return promise.resolve({});
+      return promise.resolve({ liabilityShift: "UNKNOWN" });
     },
     onError: (err) => {
       logGooglePayEvent(FPTI_TRANSITION.GOOGLEPAY_TDS_ERROR);
-      return promise.resolve(err);
+      logGooglePayEvent(err && err.message);
+      return promise.resolve({ liabilityShift: "UNKNOWN" });
     },
   });
   // $FlowIssue - need to fix this type
