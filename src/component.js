@@ -3,7 +3,7 @@
 import { confirmOrder, googlePayConfig, intiatePayerAction } from "./googlepay";
 import type { GooglePayType } from "./types";
 
-export function GooglePay(): GooglePayType {
+export function Googlepay(): GooglePayType {
   return {
     config: googlePayConfig,
     confirmOrder,
