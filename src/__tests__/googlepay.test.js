@@ -3,7 +3,7 @@
 
 import fetch from "isomorphic-fetch";
 
-import { GooglePay } from "../component";
+import { Googlepay } from "../component";
 
 jest.mock("@paypal/sdk-client/src", () => ({
   getPartnerAttributionID: () => "bn_code",
@@ -58,7 +58,7 @@ global.fetch = fetch;
 describe("googlepay", () => {
   describe("Config", () => {
     it("GetGooglePayConfig", async () => {
-      const googlepay = GooglePay();
+      const googlepay = Googlepay();
       const config = await googlepay.config();
       expect(config).toEqual({
         isEligible: true,
