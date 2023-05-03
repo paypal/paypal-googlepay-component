@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### 1.1.3 (2023-05-03)
+
+
+* change name to keep it consistent with applepay ([#11](https://github.com/paypal/paypal-googlepay-component/issues/11)) ([1f8eecd](https://github.com/paypal/paypal-googlepay-component/commit/1f8eecdf02a8ca6b0014628732e7d5f9f85aa40d))
+
 ### 1.1.2 (2023-04-21)
 
 
