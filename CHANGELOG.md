@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### 1.1.4 (2023-05-19)
+
+
+* correct initiate spelling ([#12](https://github.com/paypal/paypal-googlepay-component/issues/12)) ([5949a6a](https://github.com/paypal/paypal-googlepay-component/commit/5949a6af1b18285b126414915c108b0053986b8c))
+
 ### 1.1.3 (2023-05-03)
 
 
