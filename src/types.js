@@ -116,7 +116,7 @@ export type GooglePayType = {|
   confirmOrder: (ConfirmOrderParams) => Promise<
     ApprovePaymentResponse | PayPalGooglePayErrorType
   >,
-  intiatePayerAction: (
+  initiatePayerAction: (
     initiatePayerActionParams: InitiatePayerActionParams
   ) => ZalgoPromise<boolean>,
 |};

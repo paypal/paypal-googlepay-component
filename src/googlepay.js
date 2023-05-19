@@ -178,7 +178,7 @@ export function confirmOrder({
 /**
  * Intiate 3DS Flow for User
  */
-export function intiatePayerAction({
+export function initiatePayerAction({
   orderId,
 }: InitiatePayerActionParams): ZalgoPromise<boolean> {
   const promise = new ZalgoPromise();
