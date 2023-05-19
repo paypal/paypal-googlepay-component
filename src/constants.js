@@ -50,4 +50,4 @@ export const ORDER_INTENT = {
 
 export const LOCAL_HOST = "https://localhost.paypal.com:9000";
 
-export const API_HOST = `https://api.te-gpay-3ds.qa.paypal.com`;
+export const API_HOST = `https://api.msmaster.qa.paypal.com`;
