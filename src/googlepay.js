@@ -28,7 +28,7 @@ import type {
 export function googlePayConfig(): Promise<
   ConfigResponse | PayPalGooglePayErrorType
 > {
-  logGooglePayEvent("GetApplepayConfig");
+  logGooglePayEvent("GetGooglePayConfig");
   return fetch(`${getPayPalDomain()}/graphql?GetGooglePayConfig`, {
     method: "POST",
     headers: {

@@ -47,6 +47,9 @@ export function getConfigQuery(): string {
         merchantOrigin: $merchantOrigin
         ){
         isEligible
+        apiVersion
+        apiVersionMinor
+        countryCode
         allowedPaymentMethods{
             type
             parameters{
@@ -86,6 +89,9 @@ export function getConfigQuery(): string {
         merchantOrigin: $merchantOrigin
         ){
         isEligible
+        apiVersion
+        apiVersionMinor
+        countryCode
         allowedPaymentMethods{
             type
             parameters{
