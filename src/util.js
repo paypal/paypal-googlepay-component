@@ -72,7 +72,6 @@ export function getConfigQuery(): string {
         merchantInfo {
             merchantOrigin
             merchantId
-            authJwt
         }
         }
     }`;
