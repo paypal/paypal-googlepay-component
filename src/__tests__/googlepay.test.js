@@ -8,10 +8,10 @@ import { Googlepay } from "../component";
 jest.mock("@paypal/sdk-client/src", () => ({
   getPartnerAttributionID: () => "bn_code",
   getClientID: () =>
-    "B_AujOcb-yWAUxmdFwc_gFQC9i713jl3K-DxMvVXo06mCivoy06QycJkoxtEMwuR_H7OASqTNDPdF5by9M",
-  getMerchantID: () => [],
-  getPayPalAPIDomain: () => "https://api.te-gpay-api-e2e.qa.paypal.com",
-  getPayPalDomain: () => "https://www.te-gpay-api-e2e.qa.paypal.com",
+    "ARRXqmcYWf0Ekx1vXM_1nhs1eGSi9X_cVl6qjFb0PfTPsbhmErPrAFy4Y59kAKtG_HMzh7fcyvUVKUhO",
+  getMerchantID: () => ["WSHE4HLKU3W5N"],
+  getPayPalAPIDomain: () => "https://cors.api.sandbox.paypal.com",
+  getPayPalDomain: () => "https://www.sandbox.paypal.com",
   getBuyerCountry: () => "US",
   getLogger: () => ({
     info: () => ({
@@ -40,7 +40,7 @@ jest.mock("../util", () => {
   return {
     ...actualUtil,
     getMerchantDomain: () => "https://www.checkout.com",
-    getPayPalDomain: () => "https://www.te-gpay-api-e2e.qa.paypal.com",
+    getPayPalDomain: () => "https://www.sandbox.paypal.com",
   };
 });
 
@@ -62,6 +62,9 @@ describe("googlepay", () => {
       const config = await googlepay.config();
       expect(config).toEqual({
         isEligible: true,
+        apiVersion: 2,
+        apiVersionMinor: 0,
+        countryCode: "US",
         allowedPaymentMethods: [
           {
             type: "CARD",
@@ -77,8 +80,8 @@ describe("googlepay", () => {
             tokenizationSpecification: {
               type: "PAYMENT_GATEWAY",
               parameters: {
-                gateway: "paypalqa",
-                gatewayMerchantId: "H69FQ83GPQXP6",
+                gateway: "paypalsb",
+                gatewayMerchantId: "NDFBEMLJX9XMN",
               },
             },
           },
