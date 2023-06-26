@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## 1.2.0 (2023-06-26)
+
+
+### Features
+
+* add countrycode and api version ([#15](https://github.com/paypal/paypal-googlepay-component/issues/15)) ([7f40ada](https://github.com/paypal/paypal-googlepay-component/commit/7f40adae3ed17d362af9456dc49f8b7b90536296))
+
 ### 1.1.4 (2023-05-19)
 
 
