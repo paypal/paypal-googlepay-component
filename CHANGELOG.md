@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### 1.2.1 (2023-06-27)
+
+
+* fix tests ([#16](https://github.com/paypal/paypal-googlepay-component/issues/16)) ([2f6d54a](https://github.com/paypal/paypal-googlepay-component/commit/2f6d54a8a2a669172cd21b6ffdff25ec2591dec6))
+
 ## 1.2.0 (2023-06-26)
 
 
