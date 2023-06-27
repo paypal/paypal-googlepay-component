@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### 1.2.2 (2023-06-27)
+
+
+* add back authJWT ([#17](https://github.com/paypal/paypal-googlepay-component/issues/17)) ([19c8b0a](https://github.com/paypal/paypal-googlepay-component/commit/19c8b0a59847a62b00d3f235896a711f87bf3800))
+
 ### 1.2.1 (2023-06-27)
 
 
