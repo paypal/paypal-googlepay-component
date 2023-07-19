@@ -40,7 +40,7 @@ export function approveGooglePayPaymentWith3DS(): any {
     payment_source: null,
     links: [
       {
-        href: "https://www.msmaster1int.qa.paypal.com/webapps/helios?action=verify&flow=3ds&cart_id=87669629F7083071T",
+        href: "https://sandbox.paypal.com/webapps/helios?action=verify&flow=3ds&cart_id=87669629F7083071T",
         rel: "payer-action",
         method: "GET",
       },
