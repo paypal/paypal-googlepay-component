@@ -10,8 +10,8 @@
     "flow-typed": "flow-typed install",
     "flow": "flow",
     "flow:build": "flow gen-flow-files ./src/index.js --out-dir ./dist/module",
-    "format": "npx prettier --write .",
-    "format:check": "npx prettier --check .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "test:unit": "NODE_TLS_REJECT_UNAUTHORIZED=0  jest src/ --collectCoverage --collectCoverageFrom='src/' --testPathIgnorePatterns=/fixtures/ --no-cache --runInBand",
     "lint": "eslint --fix src/*.js",
     "test": "npm run format:check && npm run lint && npm run flow && npm run test:unit",
@@ -107,6 +107,7 @@
     "jest-environment-jsdom": "^29.2.0",
     "jest-fetch-mock": "^3.0.3",
     "mocha": "^4",
+    "prettier": "^2.8.8",
     "standard-version": "^9.3.2"
   },
   "dependencies": {
