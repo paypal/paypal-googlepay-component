@@ -82,11 +82,13 @@ export function getConfigQuery(): string {
         $clientId: String!
         $merchantId: [String]!
         $merchantOrigin: String!
+        $buyerCountry: CountryCodes
     ) {
         googlePayConfig(
         clientId: $clientId
         merchantId: $merchantId
         merchantOrigin: $merchantOrigin
+        buyerCountry: $buyerCountry
         ){
         isEligible
         apiVersion
