@@ -1,6 +1,11 @@
 /* @flow */
 
-import { getClientID, getLogger, getMerchantID } from "@paypal/sdk-client/src";
+import {
+  getClientID,
+  getLogger,
+  getMerchantID,
+  getBuyerCountry,
+} from "@paypal/sdk-client/src";
 import { FPTI_KEY } from "@paypal/sdk-constants/src";
 import { ZalgoPromise } from "@krakenjs/zalgo-promise/src";
 import { getThreeDomainSecureComponent } from "@paypal/common-components/src/three-domain-secure";
@@ -40,6 +45,7 @@ export function googlePayConfig(): Promise<
         clientId: getClientID(),
         merchantId: getMerchantID(),
         merchantOrigin: getMerchantDomain(),
+        buyerCountry: getBuyerCountry(),
       },
     }),
   })
@@ -111,6 +117,7 @@ export function confirmOrder({
                       $clientID : String!
                       $shippingAddress: GooglePayPaymentContact
                       $email: String
+                      $productFlow: String
                     ) {
                       approveGooglePayPayment(
                         paymentMethodData: $paymentMethodData
@@ -118,6 +125,7 @@ export function confirmOrder({
                         clientID: $clientID
                         shippingAddress: $shippingAddress
                         email: $email
+                        productFlow: $productFlow
                       )
                     }`,
       variables: {
@@ -126,6 +134,7 @@ export function confirmOrder({
         orderID: orderId,
         shippingAddress,
         email,
+        productFlow: "CUSTOM_DIGITAL_WALLET",
       },
     }),
   })
