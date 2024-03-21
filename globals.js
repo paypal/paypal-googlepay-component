@@ -9,6 +9,7 @@ module.exports = {
     __DEFAULT_CONTAINER__: true,
     __DEFAULT_PRERENDER__: true,
     __FRAMEWORK_SUPPORT__: true,
+    __SCRIPT_NAMESPACE__: true,
   },
 
   __POST_ROBOT__: {
