@@ -15,6 +15,7 @@ module.exports = {
   __POST_ROBOT__: {
     ...postRobotGlobals.__POST_ROBOT__,
     __IE_POPUP_SUPPORT__: false,
+    __SCRIPT_NAMESPACE__: true,
   },
 
   __PAYPAL_CHECKOUT__: {
