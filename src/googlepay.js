@@ -206,6 +206,10 @@ export function initiatePayerAction({
       logGooglePayEvent(FPTI_TRANSITION.GOOGLEPAY_TDS_CANCEL);
       return promise.resolve({ liabilityShift: "UNKNOWN" });
     },
+    onClose: () => {
+      logGooglePayEvent(FPTI_TRANSITION.GOOGLEPAY_TDS_CLOSE);
+      return promise.resolve({ liabilityShift: "UNKNOWN" });
+    },
     onError: (err) => {
       logGooglePayEvent(FPTI_TRANSITION.GOOGLEPAY_TDS_ERROR);
       logGooglePayEvent(err && err.message);
