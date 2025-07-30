@@ -21,6 +21,10 @@
     "release": "standard-version",
     "postrelease": "git push && git push --follow-tags && npm publish"
   },
+  "engines": {
+    "node": "^18",
+    "npm": "8"
+  },
   "jest": {
     "coverageDirectory": "./coverage/",
     "restoreMocks": true,
