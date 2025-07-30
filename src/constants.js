@@ -35,6 +35,7 @@ export const FPTI_TRANSITION = {
   GOOGLEPAY_CONFIG_ERROR: ("googlepay_config_error": "googlepay_config_error"),
   GOOGLEPAY_TDS_SUCCESS: ("googlepay_tds_success": "googlepay_tds_success"),
   GOOGLEPAY_TDS_CANCEL: ("googlepay_tds_cancel": "googlepay_tds_cancel"),
+  GOOGLEPAY_TDS_CLOSE: ("googlepay_tds_close": "googlepay_tds_close"),
   GOOGLEPAY_TDS_ERROR: ("googlepay_tds_error": "googlepay_tds_error"),
 };
 
