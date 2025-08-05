@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### 1.3.1 (2025-08-05)
+
+
+### Bug Fixes
+
+* update Node.js version in CI workflows to match package.json requirements ([#26](https://github.com/paypal/paypal-googlepay-component/issues/26)) ([d170412](https://github.com/paypal/paypal-googlepay-component/commit/d17041217e513500f7051422a0ab67f0c388fbad))
+
 ### 1.2.3 (2023-10-23)
 
 ### 1.2.2 (2023-06-27)
