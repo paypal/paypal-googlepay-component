@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### 1.3.3 (2025-12-01)
+
+
+* **release:** 1.3.2 ([628708b](https://github.com/paypal/paypal-googlepay-component/commit/628708b3782ade9b4002185d6036f3462710b044))
+
 ### 1.3.2 (2025-12-01)
 
 
