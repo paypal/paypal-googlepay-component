@@ -11,7 +11,6 @@ type Headers = {|
   Accept: string,
   origin: string,
   prefer: string,
-  "disable-set-cookie": string,
 |};
 
 export const DEFAULT_GQL_HEADERS: Headers = {
@@ -20,7 +19,6 @@ export const DEFAULT_GQL_HEADERS: Headers = {
   Accept: "application/json",
   origin: window.location,
   prefer: "return=representation",
-  "disable-set-cookie": "true",
 };
 
 export const FPTI_TRANSITION = {
